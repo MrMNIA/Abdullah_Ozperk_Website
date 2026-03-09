@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İletişim | Abdullah</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="simple-nav">
+        <a href="index.html">← Ana Sayfaya Dön</a>
+    </nav>
+
+    <section class="contact-page">
+        <div class="contact-card">
+            <div class="contact-form-container">
+                <h2 class="form-title">Bana Mesaj Gönder</h2>
+                <form id="contact-form" action="https://formspree.io/f/xnjgjlvg" method="POST">
+                    <div class="form-group">
+                        <input type="text" name="name" id="name" placeholder="Adınız" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" id="email" placeholder="E-posta Adresiniz" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="message" id="message" placeholder="Mesajınız..." rows="4" required></textarea>
+                    </div>
+                    <button type="submit" id="submit-btn" class="btn-main">Gönder</button>
+                </form>
+                <p id="form-status" style="display:none; margin-top:15px; color: var(--ana-yesil); font-weight:bold;"></p>
+            </div>
+            
+            <script>
+                const form = document.getElementById("contact-form");
+                const status = document.getElementById("form-status");
+
+                async function handleSubmit(event) {
+                    event.preventDefault();
+                    const data = new FormData(event.target);
+                    const btn = document.getElementById("submit-btn");
+                    btn.innerText = "Gönderiliyor...";
+                    btn.disabled = true;
+
+                    fetch(event.target.action, {
+                        method: form.method,
+                        body: data,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            status.innerHTML = "✅ Mesajınız Gönderildi";
+                            status.style.display = "block";
+                            form.reset();
+                        } else {
+                            response.json().then(data => {
+                                if (Object.hasOwn(data, 'errors')) {
+                                    status.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+                                } else {
+                                    status.innerHTML = "❌ Bir hata oluştu, tekrar deneyin.";
+                                }
+                            })
+                        }
+                        btn.innerText = "Gönder";
+                        btn.disabled = false;
+                    }).catch(error => {
+                        status.innerHTML = "❌ Sunucu ile iletişim kurulamadı.";
+                        status.style.display = "block";
+                        btn.disabled = false;
+                    });
+                }
+                form.addEventListener("submit", handleSubmit)
+            </script>
+        </div>
+    </section>
+
+</body>
+
+</html>
